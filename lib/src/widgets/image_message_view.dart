@@ -78,7 +78,7 @@ class ImageMessageView extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: imageMessageConfig?.borderRadius ??
                       BorderRadius.circular(14),
-                  child: imageUrl.fromMemory
+                  child: imageUrl.fromMemoryImage
                       ? Image.memory(
                           base64Decode(imageUrl
                               .substring(imageUrl.indexOf('base64') + 7)),

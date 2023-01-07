@@ -24,6 +24,11 @@ const String emojiRegExpression =
     r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])';
 const String imageUrlRegExpression =
     r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
+
+const String videoUrlRegExpression =
+    r'(http(s?):)([/|.|\w|\s|-])*\.(?:mp4|mov|avi|flv|wmv|mkv)';
+
+
 const String dateFormat = "yyyy-MM-dd";
 const String jpg = ".jpg";
 const String png = ".png";

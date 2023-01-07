@@ -81,5 +81,23 @@ class Data {
       messageType: MessageType.audio,
       fileType: 'acc',
     ),
+    Message(
+      id: '12',
+      message:
+      "https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4",
+      createdAt: DateTime.now(),
+      messageType: MessageType.video,
+      sendBy: '2',
+      fileType: 'mp4',
+    ),
+    Message(
+      id: '13',
+      message:
+      "https://www.orimi.com/pdf-test.pdf",
+      createdAt: DateTime.now(),
+      messageType: MessageType.file,
+      sendBy: '2',
+      fileType: 'pdf',
+    ),
   ];
 }

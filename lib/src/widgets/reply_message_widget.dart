@@ -19,12 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'dart:io';
+
 import 'package:chatview/src/controller/chat_controller.dart';
+import 'package:chatview/src/values/enumaration.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatview/src/extensions/extensions.dart';
 import 'package:chatview/src/models/models.dart';
 import 'package:chatview/src/utils/package_strings.dart';
+import 'package:video_compress/video_compress.dart';
 
 import '../utils/constants.dart';
 import 'vertical_line.dart';
@@ -52,6 +56,7 @@ class ReplyMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final replyMessage = message.replyMessage.message;
+    final replyMessageType = message.replyMessage.messageType;
     final replyBy = _replyBySender ? PackageStrings.you : messagedUser.name;
     return Container(
       margin: repliedMessageConfig?.margin ??
@@ -87,43 +92,7 @@ class ReplyMessageWidget extends StatelessWidget {
                 Flexible(
                   child: Opacity(
                     opacity: repliedMessageConfig?.opacity ?? 0.8,
-                    child: replyMessage.isImageUrl
-                        ? Container(
-                            height: repliedMessageConfig
-                                    ?.repliedImageMessageHeight ??
-                                100,
-                            width: repliedMessageConfig
-                                    ?.repliedImageMessageWidth ??
-                                80,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(replyMessage),
-                                fit: BoxFit.fill,
-                              ),
-                              borderRadius:
-                                  repliedMessageConfig?.borderRadius ??
-                                      BorderRadius.circular(14),
-                            ),
-                          )
-                        : Container(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    repliedMessageConfig?.maxWidth ?? 280),
-                            padding: repliedMessageConfig?.padding ??
-                                const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: _borderRadius(replyMessage),
-                              color: repliedMessageConfig?.backgroundColor ??
-                                  Colors.grey.shade500,
-                            ),
-                            child: Text(
-                              replyMessage,
-                              style: repliedMessageConfig?.textStyle ??
-                                  textTheme.bodyText2!
-                                      .copyWith(color: Colors.black),
-                            ),
-                          ),
+                    child: _replyBuild(replyMessage, textTheme, replyMessageType),
                   ),
                 ),
                 if (_replyBySender)
@@ -149,4 +118,101 @@ class ReplyMessageWidget extends StatelessWidget {
           (replyMessage.length < 29
               ? BorderRadius.circular(replyBorderRadius1)
               : BorderRadius.circular(replyBorderRadius2));
+
+  _replyBuild(String replyMessage, TextTheme textTheme, MessageType replyMessageType)  {
+      if(replyMessage.isImageUrl){
+        return Container(
+          height: repliedMessageConfig
+              ?.repliedImageMessageHeight ??
+              100,
+          width: repliedMessageConfig
+              ?.repliedImageMessageWidth ??
+              80,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(replyMessage),
+              fit: BoxFit.fill,
+            ),
+            borderRadius:
+            repliedMessageConfig?.borderRadius ??
+                BorderRadius.circular(14),
+          ),
+        );
+      } else if(replyMessageType == MessageType.file){
+        return Card(
+          child: Container(
+            height: repliedMessageConfig
+                ?.repliedImageMessageHeight ??
+                60,
+            width: repliedMessageConfig
+                ?.repliedImageMessageWidth ??
+                60,
+            decoration: BoxDecoration(
+              borderRadius:
+              repliedMessageConfig?.borderRadius ??
+                  BorderRadius.circular(14),
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.attach_file,
+                color: Colors.black87,
+                size: 30,
+              ),
+            ),
+          ),
+        );
+      } else if(replyMessage.isVideoUrl){
+        return FutureBuilder<File>(
+          future: VideoCompress.getFileThumbnail(replyMessage),
+          builder: (context, snapshot) {
+            if(snapshot.hasData){
+              return Container(
+                height: repliedMessageConfig
+                    ?.repliedImageMessageHeight ??
+                    100,
+                width: repliedMessageConfig
+                    ?.repliedImageMessageWidth ??
+                    80,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(snapshot.data!),
+                    fit: BoxFit.fill,
+                  ),
+                  borderRadius:
+                  repliedMessageConfig?.borderRadius ??
+                      BorderRadius.circular(14),
+                ),
+              );
+            }else if(snapshot.hasError){
+              return const SizedBox();
+
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        );
+      } else {
+        return Container(
+          constraints: BoxConstraints(
+              maxWidth:
+              repliedMessageConfig?.maxWidth ?? 280),
+          padding: repliedMessageConfig?.padding ??
+              const EdgeInsets.symmetric(
+                  vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: _borderRadius(replyMessage),
+            color: repliedMessageConfig?.backgroundColor ??
+                Colors.grey.shade500,
+          ),
+          child: Text(
+            replyMessage,
+            style: repliedMessageConfig?.textStyle ??
+                textTheme.bodyText2!
+                    .copyWith(color: Colors.black),
+          ),
+        );
+      }
+
+  }
 }

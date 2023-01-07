@@ -20,13 +20,16 @@
  * SOFTWARE.
  */
 import 'package:chatview/src/widgets/audio_message_view.dart';
+import 'package:chatview/src/widgets/video_message_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatview/src/extensions/extensions.dart';
 import 'package:chatview/src/models/models.dart';
 
+import '../models/video_message.dart';
 import '../utils/constants.dart';
 import '../values/typedefs.dart';
+import 'file_message_view.dart';
 import 'image_message_view.dart';
 import 'text_message_view.dart';
 import 'reaction_widget.dart';
@@ -45,6 +48,7 @@ class MessageView extends StatefulWidget {
     this.longPressAnimationDuration,
     this.emojiMessageConfig,
     this.onDoubleTap,
+    this.videoMessageConfig,
   }) : super(key: key);
 
   final Message message;
@@ -55,9 +59,11 @@ class MessageView extends StatefulWidget {
   final ChatBubble? outgoingChatBubbleConfig;
   final MessageReactionConfiguration? messageReactionConfig;
   final ImageMessageConfiguration? imageMessageConfig;
+  final VideoMessageConfiguration? videoMessageConfig;
   final Duration? longPressAnimationDuration;
   final EmojiMessageConfiguration? emojiMessageConfig;
   final MessageCallBack? onDoubleTap;
+
 
   @override
   State<MessageView> createState() => _MessageViewState();
@@ -66,6 +72,8 @@ class MessageView extends StatefulWidget {
 class _MessageViewState extends State<MessageView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+
+
 
   @override
   void initState() {
@@ -145,6 +153,20 @@ class _MessageViewState extends State<MessageView>
         isMessageBySender: widget.isMessageBySender,
         message: widget.message,
         chatBubbleMaxWidth: widget.chatBubbleMaxWidth,
+        messageReactionConfig: widget.messageReactionConfig,
+      );
+    }if( widget.message.messageType.isVideo){
+      return VideoMessageView(
+        message: widget.message,
+        isMessageBySender: widget.isMessageBySender,
+        videoMessageConfig: widget.videoMessageConfig,
+        messageReactionConfig: widget.messageReactionConfig,
+      );
+    }if( widget.message.messageType.isFile){
+      return FileMessageView(
+        message: widget.message,
+        isMessageBySender: widget.isMessageBySender,
+        imageMessageConfig: widget.imageMessageConfig,
         messageReactionConfig: widget.messageReactionConfig,
       );
     } else {

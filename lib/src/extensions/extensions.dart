@@ -53,8 +53,14 @@ extension ValidateString on String {
     final imageUrlRegExp = RegExp(imageUrlRegExpression);
     return imageUrlRegExp.hasMatch(this) || startsWith('data:image');
   }
+  bool get fromMemoryImage => startsWith('data:image');
 
-  bool get fromMemory => startsWith('data:image');
+  bool get isVideoUrl {
+    final videoUrlRegExp = RegExp(videoUrlRegExpression);
+    return videoUrlRegExp.hasMatch(this) || startsWith('data:video');
+  }
+  bool get fromMemoryVideo => startsWith('data:image');
+
 
   bool get isAllEmoji {
     for (String s in EmojiParser().unemojify(this).split(" ")) {
@@ -95,11 +101,11 @@ extension ChatViewStateTitleExtension on String? {
       case ChatViewState.hasMessages:
         return this ?? '';
       case ChatViewState.noData:
-        return this ?? 'No Messages';
+        return this ?? 'Sin mensajes';
       case ChatViewState.loading:
         return this ?? '';
       case ChatViewState.error:
-        return this ?? 'Something went wrong !!';
+        return this ?? 'Algo salió mal !!';
     }
   }
 }

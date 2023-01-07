@@ -33,6 +33,7 @@ import 'package:chatview/chatview.dart';
 import 'package:chatview/src/extensions/extensions.dart';
 import 'package:chatview/src/utils/package_strings.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../utils/constants.dart';
@@ -388,36 +389,9 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 ),
                               ],
                             ),
-                            _replyMessage.messageType.isImage
-                                ? Row(
-                              children: [
-                                Icon(
-                                  Icons.photo,
-                                  size: 20,
-                                  color: widget.sendMessageConfig
-                                      ?.replyMessageColor ??
-                                      Colors.grey.shade700,
-                                ),
-                                Text(
-                                  PackageStrings.photo,
-                                  style: TextStyle(
-                                    color: widget.sendMessageConfig
-                                        ?.replyMessageColor ??
-                                        Colors.black,
-                                  ),
-                                ),
-                              ],
-                            )
-                                : Text(
-                              _replyMessage.message,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: widget.sendMessageConfig
-                                    ?.replyMessageColor ??
-                                    Colors.black,
-                              ),
+                            ReplyMessageCustom(
+                              replyMessage: _replyMessage,
+                              sendMessageConfig: widget.sendMessageConfig,
                             ),
                           ],
                         ),
@@ -495,6 +469,11 @@ class _CustomChatUITextFieldState extends State<CustomChatUITextField> {
       widget.sendMessageConfig?.imagePickerIconsConfig;
 
   final ImagePicker _imagePicker = ImagePicker();
+
+  SendMessageConfiguration? get sendMessageConfig => widget.sendMessageConfig;
+
+  TextFieldConfiguration? get textFieldConfig =>
+      sendMessageConfig?.textFieldConfig;
 
   void _onIconImagePressed(ImageSource imageSource) async {
     final onImageSelected = imagePickerIconsConfig?.onImageSelected;
@@ -574,6 +553,14 @@ class _CustomChatUITextFieldState extends State<CustomChatUITextField> {
         borderRadius: widget.sendMessageConfig?.textFieldConfig?.borderRadius,
         padding: widget.sendMessageConfig?.textFieldConfig?.padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
         focusNode: widget.focusNode,
+        sendButtonBackgroundColor: widget.sendMessageConfig?.defaultSendButtonColor ?? Colors.green ,
+        sendButtonColor: Colors.white,
+        textFieldDecoration:  InputDecoration(
+          hintText: textFieldConfig?.hintText ?? PackageStrings.message,
+          hintStyle: const TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+        ),
+
         controller: widget.textEditingController,
         onRecordStart: () {
           print("onRecordStart");
@@ -719,4 +706,110 @@ class TypeMessage {
   static const String FILE = "FILE";
   static const String AUDIO = "AUDIO";
 
+}
+
+
+
+class ReplyMessageCustom extends StatelessWidget {
+  const ReplyMessageCustom({Key? key, required this.replyMessage, this.sendMessageConfig}) : super(key: key);
+  final ReplyMessage replyMessage;
+  final SendMessageConfiguration? sendMessageConfig;
+
+  @override
+  Widget build(BuildContext context) {
+    if(replyMessage.messageType.isImage){
+      return Row(
+        children: [
+          Icon(
+            Icons.photo,
+            size: 20,
+            color: sendMessageConfig
+                ?.replyMessageColor ??
+                Colors.grey.shade700,
+          ),
+          Text(
+            PackageStrings.photo,
+            style: TextStyle(
+              color: sendMessageConfig
+                  ?.replyMessageColor ??
+                  Colors.black,
+            ),
+          ),
+        ],
+      );
+    }else if(replyMessage.messageType.isVideo){
+      return Row(
+        children: [
+          Icon(
+            Icons.video_file,
+            size: 20,
+            color: sendMessageConfig
+                ?.replyMessageColor ??
+                Colors.grey.shade700,
+          ),
+          Text(
+            PackageStrings.video,
+            style: TextStyle(
+              color: sendMessageConfig
+                  ?.replyMessageColor ??
+                  Colors.black,
+            ),
+          ),
+        ],
+      );
+    }else if(replyMessage.messageType.isFile){
+      return Row(
+        children: [
+          Icon(
+            FontAwesomeIcons.file,
+            size: 20,
+            color: sendMessageConfig
+                ?.replyMessageColor ??
+                Colors.grey.shade700,
+          ),
+          Text(
+            PackageStrings.file,
+            style: TextStyle(
+              color: sendMessageConfig
+                  ?.replyMessageColor ??
+                  Colors.black,
+            ),
+          ),
+        ],
+      );
+    } else if(replyMessage.messageType.isAudio){
+      return Row(
+        children: [
+          Icon(
+            Icons.audiotrack,
+            size: 20,
+            color: sendMessageConfig
+                ?.replyMessageColor ??
+                Colors.grey.shade700,
+          ),
+          Text(
+            PackageStrings.audio,
+            style: TextStyle(
+              color: sendMessageConfig
+                  ?.replyMessageColor ??
+                  Colors.black,
+            ),
+          ),
+        ],
+      );
+    }else {
+      return Text(
+        replyMessage.message,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 12,
+          color: sendMessageConfig
+              ?.replyMessageColor ??
+              Colors.black,
+        ),
+      );
+    }
+
+  }
 }

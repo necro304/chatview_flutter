@@ -110,7 +110,6 @@ class AudioMessageView extends StatelessWidget {
 }
 
 
-const _boum = 'assets/flutter_sound_example_assets_samples_sample.aac';
 
 ///
 typedef Fn = void Function();
@@ -141,7 +140,7 @@ class _AudioPlayerProgressState extends State<AudioPlayerProgress> {
 
   @override
   void dispose() {
-
+    _player.dispose();
 
     super.dispose();
   }
