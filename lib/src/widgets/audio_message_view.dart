@@ -74,7 +74,7 @@ class AudioMessageView extends StatelessWidget {
             borderRadius: _borderRadius(textMessage),
           ),
           // audio message
-          child: const AudioPlayerProgress(),
+          child:  AudioPlayerProgress(message: message),
         ),
         if (message.reaction.isNotEmpty)
           ReactionWidget(
@@ -116,7 +116,8 @@ typedef Fn = void Function();
 
 
 class AudioPlayerProgress extends StatefulWidget {
-  const AudioPlayerProgress({Key? key}) : super(key: key);
+  const AudioPlayerProgress({Key? key, required this.message}) : super(key: key);
+  final Message message;
 
   @override
   State<AudioPlayerProgress> createState() => _AudioPlayerProgressState();
@@ -126,16 +127,10 @@ class _AudioPlayerProgressState extends State<AudioPlayerProgress> {
 
   final _player = AudioPlayer();
 
-
-
-
-
-
   @override
   void initState() {
     super.initState();
     _init();
-
   }
 
   @override
@@ -147,19 +142,15 @@ class _AudioPlayerProgressState extends State<AudioPlayerProgress> {
 
 
   Future<void> _init() async {
-    // Inform the operating system of our app's audio attributes etc.
-    // We pick a reasonable default for an app that plays speech.
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.speech());
-    // Listen to errors during playback.
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
           print('A stream error occurred: $e');
         });
-    // Try to load audio from a source and catch any errors.
     try {
       // AAC example: https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.aac
-      final audioSource = LockCachingAudioSource(Uri.parse("https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.aac"));
+      final audioSource = LockCachingAudioSource(Uri.parse(widget.message.message));
       await _player.setAudioSource(audioSource);
 
       // await _player.setAudioSource(AudioSource.uri(Uri.parse(
