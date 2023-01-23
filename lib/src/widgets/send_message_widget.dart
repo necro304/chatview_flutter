@@ -153,7 +153,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   void dispose() {
-    widget.chatController.textEditingController.dispose();
+    //widget.chatController.textEditingController.dispose();
     super.dispose();
   }
 
