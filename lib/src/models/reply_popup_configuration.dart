@@ -27,7 +27,7 @@ import 'message.dart';
 class ReplyPopupConfiguration {
   final Color? backgroundColor;
   final Widget Function(Message message, bool sendByCurrentUser)?
-      replyPopupBuilder;
+  replyPopupBuilder;
   final MessageCallBack? onUnsendTap;
   final MessageCallBack? onReplyTap;
   final VoidCallBack? onReportTap;

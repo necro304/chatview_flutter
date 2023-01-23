@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-enum MessageType { image, text, video, audio, file, sticker }
+enum MessageType { image, text, video, audio, file, sticker, custom }
 
 enum ChatViewState { hasMessages, noData, loading, error }
 

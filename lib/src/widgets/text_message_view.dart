@@ -37,6 +37,8 @@ class TextMessageView extends StatelessWidget {
     this.inComingChatBubbleConfig,
     this.outgoingChatBubbleConfig,
     this.messageReactionConfig,
+    this.highlightMessage = false,
+    this.highlightColor,
   }) : super(key: key);
 
   final bool isMessageBySender;
@@ -45,12 +47,15 @@ class TextMessageView extends StatelessWidget {
   final ChatBubble? inComingChatBubbleConfig;
   final ChatBubble? outgoingChatBubbleConfig;
   final MessageReactionConfiguration? messageReactionConfig;
+  final bool highlightMessage;
+  final Color? highlightColor;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final textMessage = message.message;
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         Container(
           constraints: BoxConstraints(
@@ -63,29 +68,30 @@ class TextMessageView extends StatelessWidget {
               ),
           margin: _margin ??
               EdgeInsets.fromLTRB(
-                  5, 0, 6, message.reaction.isNotEmpty ? 15 : 2),
+                  5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
           decoration: BoxDecoration(
-            color: _color,
+            color: highlightMessage ? highlightColor : _color,
             borderRadius: _borderRadius(textMessage),
           ),
           child: textMessage.isUrl
               ? LinkPreview(
-                  linkPreviewConfig: _linkPreviewConfig,
-                  url: textMessage,
-                )
+            linkPreviewConfig: _linkPreviewConfig,
+            url: textMessage,
+          )
               : Text(
-                  textMessage,
-                  style: _textStyle ??
-                      textTheme.bodyText2!.copyWith(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+            textMessage,
+            style: _textStyle ??
+                textTheme.bodyText2!.copyWith(
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
+          ),
         ),
-        if (message.reaction.isNotEmpty)
+        if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(
+            key: key,
             isMessageBySender: isMessageBySender,
-            reaction: message.reaction.toString(),
+            reaction: message.reaction,
             messageReactionConfig: messageReactionConfig,
           ),
       ],
@@ -110,13 +116,13 @@ class TextMessageView extends StatelessWidget {
 
   BorderRadiusGeometry _borderRadius(String message) => isMessageBySender
       ? outgoingChatBubbleConfig?.borderRadius ??
-          (message.length < 37
-              ? BorderRadius.circular(replyBorderRadius1)
-              : BorderRadius.circular(replyBorderRadius2))
+      (message.length < 37
+          ? BorderRadius.circular(replyBorderRadius1)
+          : BorderRadius.circular(replyBorderRadius2))
       : inComingChatBubbleConfig?.borderRadius ??
-          (message.length < 29
-              ? BorderRadius.circular(replyBorderRadius1)
-              : BorderRadius.circular(replyBorderRadius2));
+      (message.length < 29
+          ? BorderRadius.circular(replyBorderRadius1)
+          : BorderRadius.circular(replyBorderRadius2));
 
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple

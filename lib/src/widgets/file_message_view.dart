@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
@@ -14,12 +13,16 @@ class FileMessageView extends StatelessWidget {
     required this.isMessageBySender,
     this.imageMessageConfig,
     this.messageReactionConfig,
+    this.highlightMessage = false,
+    this.highlightColor,
   }) : super(key: key);
 
   final Message message;
   final bool isMessageBySender;
   final ImageMessageConfiguration? imageMessageConfig;
   final MessageReactionConfiguration? messageReactionConfig;
+  final bool highlightMessage;
+  final Color? highlightColor;
 
   String get fileUrl => message.message;
 
@@ -62,7 +65,6 @@ class FileMessageView extends StatelessWidget {
       case "m4v":
       case "vob":
       case "ogv":
-      case "ogg":
       case "rm":
       case "rmvb":
       case "m3u8":
@@ -102,7 +104,7 @@ class FileMessageView extends StatelessWidget {
                       top: 6,
                       right: isMessageBySender ? 6 : 0,
                       left: isMessageBySender ? 0 : 6,
-                      bottom: message.reaction.isNotEmpty ? 15 : 0,
+                      bottom: message.reaction.reactions.isNotEmpty ? 15 : 0,
                     ),
                 child: ClipRRect(
                   borderRadius: imageMessageConfig?.borderRadius ??
@@ -138,10 +140,11 @@ class FileMessageView extends StatelessWidget {
                   ),
                 ),
               ),
-            if (message.reaction.isNotEmpty)
+            if (message.reaction.reactions.isNotEmpty)
               ReactionWidget(
+                key: key,
                 isMessageBySender: isMessageBySender,
-                reaction: message.reaction.toString(),
+                reaction: message.reaction,
                 messageReactionConfig: messageReactionConfig,
               ),
           ],

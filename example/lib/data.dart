@@ -33,17 +33,18 @@ class Data {
       message: "That's fine",
       createdAt: DateTime.now(),
       sendBy: '2',
-      reaction: '❤️',
+      reaction: Reaction(reactions: ['❤️'], reactedUserIds: ['1']),
     ),
     Message(
       id: '6',
       message: "https://bit.ly/3JHS2Wl",
       createdAt: DateTime.now(),
       sendBy: '2',
-      replyMessage: ReplyMessage(
+      replyMessage: const ReplyMessage(
         message: "Can you write the time and place of the meeting?",
         replyTo: '1',
         replyBy: '2',
+        messageId: '4'
       ),
     ),
     Message(
@@ -65,7 +66,10 @@ class Data {
       createdAt: DateTime.now(),
       messageType: MessageType.image,
       sendBy: '1',
-      reaction: '❤️',
+      reaction: Reaction(
+        reactions: ['❤️', '👍',],
+        reactedUserIds: ['2', '3',],
+      ),
     ),
     Message(
       id: '10',
@@ -75,7 +79,7 @@ class Data {
     ),
     Message(
       id: '11',
-      message: "test",
+      message: "https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.aac",
       createdAt: DateTime.now(),
       sendBy: '2',
       messageType: MessageType.audio,

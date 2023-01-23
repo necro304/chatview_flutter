@@ -31,14 +31,14 @@ class ChatUser {
   });
 
   factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
-        id: json["id"],
-        name: json["name"],
-        profilePhoto: json["profilePhoto"],
-      );
+    id: json["id"],
+    name: json["name"],
+    profilePhoto: json["profilePhoto"],
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'profilePhoto': profilePhoto,
-      };
+    'id': id,
+    'name': name,
+    'profilePhoto': profilePhoto,
+  };
 }

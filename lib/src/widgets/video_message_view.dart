@@ -18,12 +18,17 @@ class VideoMessageView extends StatelessWidget {
     required this.isMessageBySender,
     this.videoMessageConfig,
     this.messageReactionConfig,
+    this.highlightMessage = false,
+    this.highlightColor,
   }) : super(key: key);
 
   final Message message;
   final bool isMessageBySender;
   final VideoMessageConfiguration? videoMessageConfig;
   final MessageReactionConfiguration? messageReactionConfig;
+  final bool highlightMessage;
+  final Color? highlightColor;
+
 
   String get videoUrl => message.message;
 
@@ -49,7 +54,7 @@ class VideoMessageView extends StatelessWidget {
                     top: 6,
                     right: isMessageBySender ? 6 : 0,
                     left: isMessageBySender ? 0 : 6,
-                    bottom: message.reaction.isNotEmpty ? 15 : 0,
+                    bottom: message.reaction.reactions.isNotEmpty ? 15 : 0,
                   ),
               height: videoMessageConfig?.height ?? 200,
               width: videoMessageConfig?.width ?? 200,
@@ -68,10 +73,11 @@ class VideoMessageView extends StatelessWidget {
                       ),
               ),
             ),
-            if (message.reaction.isNotEmpty)
+            if (message.reaction.reactions.isNotEmpty)
               ReactionWidget(
+                key: key,
                 isMessageBySender: isMessageBySender,
-                reaction: message.reaction.toString(),
+                reaction: message.reaction,
                 messageReactionConfig: messageReactionConfig,
               ),
           ],

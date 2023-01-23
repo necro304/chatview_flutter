@@ -66,8 +66,7 @@ class SendMessageWidget extends StatefulWidget {
 }
 
 class SendMessageWidgetState extends State<SendMessageWidget> {
-  final _textEditingController = TextEditingController();
-  ReplyMessage _replyMessage = ReplyMessage();
+  ReplyMessage _replyMessage = const ReplyMessage();
   final _focusNode = FocusNode();
   late StreamSubscription<bool> keyboardSubscription;
 
@@ -97,13 +96,13 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _onPressed() {
-    if (_textEditingController.text.isNotEmpty &&
-        !_textEditingController.text.startsWith('\n')) {
-      widget.onSendTap(_textEditingController.text, _replyMessage);
+    if (widget.chatController.textEditingController.text.isNotEmpty &&
+        !widget.chatController.textEditingController.text.startsWith('\n')) {
+      widget.onSendTap(widget.chatController.textEditingController.text, _replyMessage);
       if (_replyMessage.message.isNotEmpty) {
-        setState(() => _replyMessage = ReplyMessage());
+        setState(() => _replyMessage = const ReplyMessage());
       }
-      _textEditingController.clear();
+      widget.chatController.textEditingController.clear();
       setState(() {
         emojiShowing = false;
       });
@@ -132,6 +131,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
         replyBy: widget.currentUser.id,
         replyTo: message.sendBy,
         messageType: message.messageType,
+        messageId: message.id,
       );
     });
     FocusScope.of(context).requestFocus(_focusNode);
@@ -139,7 +139,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _onCloseTap() {
-    setState(() => _replyMessage = ReplyMessage());
+    setState(() => _replyMessage = const ReplyMessage());
     if (widget.onReplyCloseCallback != null) widget.onReplyCloseCallback!();
   }
 
@@ -153,7 +153,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    widget.chatController.textEditingController.dispose();
     super.dispose();
   }
 
@@ -285,7 +285,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                     ),
                   ChatUITextField(
                     focusNode: _focusNode,
-                    textEditingController: _textEditingController,
+                    textEditingController: widget.chatController.textEditingController,
                     onPressed: _onPressed,
                     sendMessageConfig: widget.sendMessageConfig,
                   )
@@ -406,7 +406,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                           height: 60,
                           child: CustomChatUITextField(
                             focusNode: _focusNode,
-                            textEditingController: _textEditingController,
+                            textEditingController: widget.chatController.textEditingController,
                             onPressed: _onPressed,
                             sendMessageConfig: widget.sendMessageConfig,
                             onPressedEmoji: (){
@@ -423,7 +423,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                             child: EmojiPicker(
                               // 2. Set global key here
                               key: key,
-                              textEditingController: _textEditingController,
+                              textEditingController: widget.chatController.textEditingController,
                             ),
                           ),
                         ),

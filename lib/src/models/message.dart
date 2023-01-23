@@ -19,16 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/models/reply_message.dart';
-import 'package:chatview/src/values/enumaration.dart';
+import 'package:chatview/chatview.dart';
+import 'package:flutter/cupertino.dart';
 
 class Message {
   final String id;
+  final GlobalKey key;
   final String message;
   final DateTime createdAt;
   final String sendBy;
   final ReplyMessage replyMessage;
-  final String reaction;
+  final Reaction reaction;
   final MessageType messageType;
   final String? fileType;
 
@@ -37,19 +38,19 @@ class Message {
     required this.message,
     required this.createdAt,
     required this.sendBy,
-    ReplyMessage? replyMessage,
-    this.reaction = '',
+    this.replyMessage = const ReplyMessage(),
+    Reaction? reaction,
     this.messageType = MessageType.text,
     this.fileType,
-  }) : replyMessage = replyMessage ?? ReplyMessage();
-
+  })  : reaction = reaction ?? Reaction(reactions: [], reactedUserIds: []),
+        key = GlobalKey();
   factory Message.fromJson(Map<String, dynamic> json) => Message(
         id: json["id"],
         message: json["message"],
         createdAt: json["createdAt"],
         sendBy: json["sendBy"],
         replyMessage: ReplyMessage.fromJson(json["reply_message"]),
-        reaction: json["reaction"] ?? '',
+        reaction: Reaction.fromJson(json["reaction"]),
         messageType: json["message_type"],
       );
 
@@ -59,7 +60,7 @@ class Message {
         'createdAt': createdAt,
         'sendBy': sendBy,
         'reply_message': replyMessage.toJson(),
-        'reaction': reaction,
+        'reaction': reaction.toJson(),
         'message_type': messageType,
       };
 }

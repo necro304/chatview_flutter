@@ -33,6 +33,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
   final currentUser = ChatUser(
@@ -43,10 +44,16 @@ class _ChatScreenState extends State<ChatScreen> {
   final _chatController = ChatController(
     initialMessageList: Data.messageList,
     scrollController: ScrollController(),
+    textEditingController: TextEditingController(),
     chatUsers: [
       ChatUser(
         id: '2',
         name: 'Simform',
+        profilePhoto: Data.profileImage,
+      ),
+      ChatUser(
+        id: '3',
+        name: 'Jhon',
         profilePhoto: Data.profileImage,
       ),
     ],
@@ -161,7 +168,11 @@ class _ChatScreenState extends State<ChatScreen> {
             blurRadius: 20,
           ),
           backgroundColor: theme.reactionPopupColor,
-          onEmojiTap: _chatController.setReaction,
+          onEmojiTap: (emoji, messageId) => _chatController.setReaction(
+            emoji: emoji,
+            messageId: messageId,
+            userId: currentUser.id,
+          ),
         ),
         messageConfig: MessageConfiguration(
           messageReactionConfig: MessageReactionConfiguration(
@@ -180,6 +191,11 @@ class _ChatScreenState extends State<ChatScreen> {
         repliedMessageConfig: RepliedMessageConfiguration(
           backgroundColor: theme.repliedMessageColor,
           verticalBarColor: theme.verticalBarColor,
+          repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
+            enableHighlightRepliedMsg: true,
+            highlightColor: Colors.pinkAccent.shade100,
+            highlightScale: 1.1,
+          ),
           textStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

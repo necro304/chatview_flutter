@@ -22,6 +22,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatview/src/models/models.dart';
@@ -43,6 +44,8 @@ class AudioMessageView extends StatelessWidget {
     this.inComingChatBubbleConfig,
     this.outgoingChatBubbleConfig,
     this.messageReactionConfig,
+    this.highlightMessage = false,
+    this.highlightColor,
   }) : super(key: key);
 
   final bool isMessageBySender;
@@ -51,11 +54,14 @@ class AudioMessageView extends StatelessWidget {
   final ChatBubble? inComingChatBubbleConfig;
   final ChatBubble? outgoingChatBubbleConfig;
   final MessageReactionConfiguration? messageReactionConfig;
+  final bool highlightMessage;
+  final Color? highlightColor;
 
   @override
   Widget build(BuildContext context) {
     final textMessage = message.message;
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         Container(
           constraints: BoxConstraints(
@@ -68,20 +74,21 @@ class AudioMessageView extends StatelessWidget {
               ),
           margin: _margin ??
               EdgeInsets.fromLTRB(
-                  5, 0, 6, message.reaction.isNotEmpty ? 15 : 2),
+                  5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
           decoration: BoxDecoration(
-            color: _color,
+            color: highlightMessage ? highlightColor : _color,
             borderRadius: _borderRadius(textMessage),
           ),
           // audio message
           child:  AudioPlayerProgress(message: message),
         ),
-        if (message.reaction.isNotEmpty)
+        if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(
+            key: key,
             isMessageBySender: isMessageBySender,
-            reaction: message.reaction.toString(),
+            reaction: message.reaction,
             messageReactionConfig: messageReactionConfig,
-          ),
+          )
       ],
     );
   }
@@ -146,7 +153,9 @@ class _AudioPlayerProgressState extends State<AudioPlayerProgress> {
     await session.configure(const AudioSessionConfiguration.speech());
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
-          print('A stream error occurred: $e');
+          if (kDebugMode) {
+            print('A stream error occurred: $e');
+          }
         });
     try {
       // AAC example: https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.aac

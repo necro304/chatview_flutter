@@ -27,7 +27,11 @@ class ReplyMessage {
   final String replyTo;
   final MessageType messageType;
 
-  ReplyMessage({
+  /// Id of message, it replies to.
+  final String messageId;
+
+  const ReplyMessage({
+    this.messageId = '',
     this.message = '',
     this.replyTo = '',
     this.replyBy = '',
@@ -35,16 +39,18 @@ class ReplyMessage {
   });
 
   factory ReplyMessage.fromJson(Map<String, dynamic> json) => ReplyMessage(
-        message: json['message'],
-        replyBy: json['replyBy'],
-        replyTo: json['replyTo'],
-        messageType: json["message_type"],
-      );
+    message: json['message'],
+    replyBy: json['replyBy'],
+    replyTo: json['replyTo'],
+    messageType: json["message_type"],
+    messageId: json["id"],
+  );
 
   Map<String, dynamic> toJson() => {
-        'message': message,
-        'replyBy': replyBy,
-        'replyTo': replyTo,
-        'message_type': messageType,
-      };
+    'message': message,
+    'replyBy': replyBy,
+    'replyTo': replyTo,
+    'message_type': messageType,
+    'id': messageId,
+  };
 }

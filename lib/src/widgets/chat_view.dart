@@ -22,6 +22,7 @@
 import 'package:chatview/chatview.dart';
 import 'package:chatview/src/widgets/chat_list_widget.dart';
 import 'package:chatview/src/widgets/chatview_state_widget.dart';
+import 'package:chatview/src/widgets/chat_view_inherited_widget.dart';
 
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,6 @@ class ChatView extends StatefulWidget {
     required this.currentUser,
     this.onSendTap,
     this.showReceiverProfileCircle = true,
-    this.enablePagination = false,
     this.profileCircleConfig,
     this.chatBubbleConfig,
     this.repliedMessageConfig,
@@ -53,9 +53,10 @@ class ChatView extends StatefulWidget {
     this.sendMessageConfig,
     required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
+    this.featureActiveConfig = const FeatureActiveConfig(),
     this.whatsappStyle = true
   })  : chatBackgroundConfig =
-            chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
+      chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig =
             chatViewStateConfig ?? const ChatViewStateConfiguration(),
         super(key: key);
@@ -71,7 +72,6 @@ class ChatView extends StatefulWidget {
   final ReactionPopupConfiguration? reactionPopupConfig;
   final ChatBackgroundConfiguration chatBackgroundConfig;
   final VoidCallBackWithFuture? loadMoreData;
-  final bool enablePagination;
   final Widget? loadingWidget;
   final bool? isLastPage;
   final StringMessageCallBack? onSendTap;
@@ -83,6 +83,7 @@ class ChatView extends StatefulWidget {
   final ChatViewState chatViewState;
   final ChatViewStateConfiguration? chatViewStateConfig;
   final ChatUser currentUser;
+  final FeatureActiveConfig featureActiveConfig;
 
   final Widget? appBar;
 
@@ -93,7 +94,7 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
-  ReplyMessage replyMessage = ReplyMessage();
+  ReplyMessage replyMessage = const ReplyMessage();
 
   ChatController get chatController => widget.chatController;
 
@@ -107,94 +108,109 @@ class _ChatViewState extends State<ChatView>
   ChatViewStateConfiguration? get chatViewStateConfig =>
       widget.chatViewStateConfig;
 
+  FeatureActiveConfig get featureActiveConfig =>
+      widget.featureActiveConfig;
+
+  @override
+  void initState() {
+    super.initState();
+    chatController.chatUsers.add(widget.currentUser);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (showTypingIndicator && chatViewState.hasMessages) {
       chatController.scrollToLastMessage();
     }
-    return Container(
-      height: chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
-      width: chatBackgroundConfig.width ?? MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: chatBackgroundConfig.backgroundColor ?? Colors.white,
-        image: chatBackgroundConfig.backgroundImage != null
-            ? DecorationImage(
-                fit: BoxFit.fill,
-                image: NetworkImage(chatBackgroundConfig.backgroundImage!),
-              )
-            : null,
-      ),
-      padding: chatBackgroundConfig.padding,
-      margin: chatBackgroundConfig.margin,
-      child: Column(
-        children: [
-          if (widget.appBar != null) widget.appBar!,
-          Expanded(
-            child: Stack(
-              children: [
-                if (chatViewState.isLoading)
-                  ChatViewStateWidget(
-                    chatViewStateWidgetConfig:
-                        chatViewStateConfig?.loadingWidgetConfig,
-                    chatViewState: chatViewState,
-                  )
-                else if (chatViewState.noMessages)
-                  ChatViewStateWidget(
-                    chatViewStateWidgetConfig:
-                        chatViewStateConfig?.noMessageWidgetConfig,
-                    chatViewState: chatViewState,
-                    onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
-                  )
-                else if (chatViewState.isError)
-                  ChatViewStateWidget(
-                    chatViewStateWidgetConfig:
+    return ChatViewInheritedWidget(
+      chatController: chatController,
+      featureActiveConfig: featureActiveConfig,
+      child: Container(
+        height:
+        chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
+        width: chatBackgroundConfig.width ?? MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: chatBackgroundConfig.backgroundColor ?? Colors.white,
+          image: chatBackgroundConfig.backgroundImage != null
+              ? DecorationImage(
+            fit: BoxFit.fill,
+            image: NetworkImage(chatBackgroundConfig.backgroundImage!),
+          )
+              : null,
+        ),
+        padding: chatBackgroundConfig.padding,
+        margin: chatBackgroundConfig.margin,
+        child: Column(
+          children: [
+            if (widget.appBar != null) widget.appBar!,
+            Expanded(
+              child: Stack(
+                children: [
+                  if (chatViewState.isLoading)
+                    ChatViewStateWidget(
+                      chatViewStateWidgetConfig:
+                      chatViewStateConfig?.loadingWidgetConfig,
+                      chatViewState: chatViewState,
+                    )
+                  else if (chatViewState.noMessages)
+                    ChatViewStateWidget(
+                      chatViewStateWidgetConfig:
+                      chatViewStateConfig?.noMessageWidgetConfig,
+                      chatViewState: chatViewState,
+                      onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
+                    )
+                  else if (chatViewState.isError)
+                      ChatViewStateWidget(
+                        chatViewStateWidgetConfig:
                         chatViewStateConfig?.errorWidgetConfig,
-                    chatViewState: chatViewState,
-                    onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
-                  )
-                else if (chatViewState.hasMessages)
-                  ChatListWidget(
-                    currentUser: widget.currentUser,
-                    showTypingIndicator: widget.showTypingIndicator,
-                    enablePagination: widget.enablePagination,
-                    showReceiverProfileCircle: widget.showReceiverProfileCircle,
-                    replyMessage: replyMessage,
-                    chatController: widget.chatController,
-                    whatsappStyle: widget.whatsappStyle,
-                    chatBackgroundConfig: widget.chatBackgroundConfig,
-                    reactionPopupConfig: widget.reactionPopupConfig,
-                    typeIndicatorConfig: widget.typeIndicatorConfig,
-                    chatBubbleConfig: widget.chatBubbleConfig,
-                    loadMoreData: widget.loadMoreData,
-                    isLastPage: widget.isLastPage,
-                    replyPopupConfig: widget.replyPopupConfig,
-                    loadingWidget: widget.loadingWidget,
-                    messageConfig: widget.messageConfig,
-                    profileCircleConfig: widget.profileCircleConfig,
-                    repliedMessageConfig: widget.repliedMessageConfig,
-                    swipeToReplyConfig: widget.swipeToReplyConfig,
-                    assignReplyMessage: (message) => _sendMessageKey
-                        .currentState
-                        ?.assignReplyMessage(message),
-                  ),
-                SendMessageWidget(
-                  key: _sendMessageKey,
-                  chatController: chatController,
-                  sendMessageBuilder: widget.sendMessageBuilder,
-                  sendMessageConfig: widget.sendMessageConfig,
-                  backgroundColor: chatBackgroundConfig.backgroundColor,
-                  onSendTap: _onSendTap,
-                  currentUser: widget.currentUser,
-                  whatsappStyle: widget.whatsappStyle,
-                  onReplyCallback: (reply) =>
-                      setState(() => replyMessage = reply),
-                  onReplyCloseCallback: () =>
-                      setState(() => replyMessage = ReplyMessage()),
-                ),
-              ],
+                        chatViewState: chatViewState,
+                        onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
+                      )
+                    else if (chatViewState.hasMessages)
+                        ChatListWidget(
+                          currentUser: widget.currentUser,
+                          showTypingIndicator: widget.showTypingIndicator,
+                          showReceiverProfileCircle:
+                          widget.showReceiverProfileCircle,
+                          replyMessage: replyMessage,
+                          chatController: widget.chatController,
+                          chatBackgroundConfig: widget.chatBackgroundConfig,
+                          reactionPopupConfig: widget.reactionPopupConfig,
+                          typeIndicatorConfig: widget.typeIndicatorConfig,
+                          chatBubbleConfig: widget.chatBubbleConfig,
+                          loadMoreData: widget.loadMoreData,
+                          isLastPage: widget.isLastPage,
+                          replyPopupConfig: widget.replyPopupConfig,
+                          loadingWidget: widget.loadingWidget,
+                          messageConfig: widget.messageConfig,
+                          profileCircleConfig: widget.profileCircleConfig,
+                          repliedMessageConfig: widget.repliedMessageConfig,
+                          swipeToReplyConfig: widget.swipeToReplyConfig,
+                          whatsappStyle: widget.whatsappStyle,
+                          assignReplyMessage: (message) => _sendMessageKey
+                              .currentState
+                              ?.assignReplyMessage(message),
+                        ),
+                  if (featureActiveConfig.enableTextField)
+                    SendMessageWidget(
+                      key: _sendMessageKey,
+                      chatController: chatController,
+                      sendMessageBuilder: widget.sendMessageBuilder,
+                      sendMessageConfig: widget.sendMessageConfig,
+                      backgroundColor: chatBackgroundConfig.backgroundColor,
+                      onSendTap: _onSendTap,
+                      currentUser: widget.currentUser,
+                      onReplyCallback: (reply) =>
+                          setState(() => replyMessage = reply),
+                      onReplyCloseCallback: () =>
+                          setState(() => replyMessage = const ReplyMessage()),
+                      whatsappStyle: widget.whatsappStyle,
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -211,7 +227,7 @@ class _ChatViewState extends State<ChatView>
 
   void _assignReplyMessage() {
     if (replyMessage.message.isNotEmpty) {
-      setState(() => replyMessage = ReplyMessage());
+      setState(() => replyMessage = const ReplyMessage());
     }
   }
 }
