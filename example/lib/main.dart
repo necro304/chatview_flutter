@@ -44,7 +44,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final _chatController = ChatController(
     initialMessageList: Data.messageList,
     scrollController: ScrollController(),
-    textEditingController: TextEditingController(),
     chatUsers: [
       ChatUser(
         id: '2',

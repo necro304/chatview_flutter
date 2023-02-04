@@ -66,6 +66,7 @@ class SendMessageWidget extends StatefulWidget {
 }
 
 class SendMessageWidgetState extends State<SendMessageWidget> {
+  final _textEditingController = TextEditingController();
   ReplyMessage _replyMessage = const ReplyMessage();
   final _focusNode = FocusNode();
   late StreamSubscription<bool> keyboardSubscription;
@@ -96,13 +97,13 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _onPressed() {
-    if (widget.chatController.textEditingController.text.isNotEmpty &&
-        !widget.chatController.textEditingController.text.startsWith('\n')) {
-      widget.onSendTap(widget.chatController.textEditingController.text, _replyMessage);
+    if (_textEditingController.text.isNotEmpty &&
+        !_textEditingController.text.startsWith('\n')) {
+      widget.onSendTap(_textEditingController.text, _replyMessage);
       if (_replyMessage.message.isNotEmpty) {
         setState(() => _replyMessage = const ReplyMessage());
       }
-      widget.chatController.textEditingController.clear();
+      _textEditingController.clear();
       setState(() {
         emojiShowing = false;
       });
@@ -119,6 +120,12 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
         setState(() {
           emojiShowing = false;
         });
+      }
+    });
+
+    _textEditingController.addListener(() {
+      if (_textEditingController.text.isNotEmpty) {
+        widget.sendMessageConfig?.onChangedText?.call(_textEditingController.text);
       }
     });
 
@@ -153,7 +160,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   void dispose() {
-    //widget.chatController.textEditingController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -285,7 +292,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                     ),
                   ChatUITextField(
                     focusNode: _focusNode,
-                    textEditingController: widget.chatController.textEditingController,
+                    textEditingController: _textEditingController,
                     onPressed: _onPressed,
                     sendMessageConfig: widget.sendMessageConfig,
                   )
@@ -406,7 +413,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                           height: 60,
                           child: CustomChatUITextField(
                             focusNode: _focusNode,
-                            textEditingController: widget.chatController.textEditingController,
+                            textEditingController: _textEditingController,
                             onPressed: _onPressed,
                             sendMessageConfig: widget.sendMessageConfig,
                             onPressedEmoji: (){
@@ -423,7 +430,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                             child: EmojiPicker(
                               // 2. Set global key here
                               key: key,
-                              textEditingController: widget.chatController.textEditingController,
+                              textEditingController: _textEditingController,
                             ),
                           ),
                         ),
@@ -560,8 +567,8 @@ class _CustomChatUITextFieldState extends State<CustomChatUITextField> {
           hintStyle: const TextStyle(color: Colors.grey),
           border: InputBorder.none,
         ),
-
         controller: widget.textEditingController,
+
         onRecordStart: () {
           print("onRecordStart");
         },

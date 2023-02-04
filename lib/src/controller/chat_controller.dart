@@ -29,13 +29,11 @@ class ChatController {
   List<Message> initialMessageList;
   ScrollController scrollController;
   List<ChatUser> chatUsers;
-  TextEditingController textEditingController = TextEditingController();
 
   ChatController({
     required this.initialMessageList,
     required this.scrollController,
     required this.chatUsers,
-    required this.textEditingController,
   });
 
   StreamController<List<Message>> messageStreamController = StreamController();

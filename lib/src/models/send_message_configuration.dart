@@ -34,6 +34,7 @@ class SendMessageConfiguration {
   final Color? closeIconColor;
   final ImagePickerIconsConfiguration? imagePickerIconsConfig;
   final TextFieldConfiguration? textFieldConfig;
+  final TextCallBack? onChangedText;
 
   SendMessageConfiguration({
     this.textFieldConfig,
@@ -45,6 +46,7 @@ class SendMessageConfiguration {
     this.replyTitleColor,
     this.replyMessageColor,
     this.closeIconColor,
+    this.onChangedText,
   });
 }
 
